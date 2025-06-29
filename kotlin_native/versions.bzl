@@ -109,27 +109,5 @@ VERSIONS = {
             }],
         },
     },
-    "2.2.0-RC2": {
-        "macos-aarch64": {
-            "targets": [
-                "ios_x64",
-                "ios_arm64",
-                "ios_simulator_arm64",
-                "macos_x64",
-                "macos_arm64",
-            ],
-            "sha256": "af60e6f420f737b057ea846608a7beb03ce0275b33e93dcb026c2109ee694582",
-            "dependencies": [{
-                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.3-1-macos-arm64.tar.gz"],
-                "sha256": "8ca0102ad5b626e8b1699f311ab098354a90154ea3e44951f28ebdd256862ba9",
-            }, {
-                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/16.0.0-aarch64-macos/llvm-16.0.0-aarch64-macos-essentials-65.tar.gz"],
-                "sha256": "17ea70d51199172e8bbd295a1eb5279e3b352e2aa1e352ea01c79595175e81d2",
-            }, {
-                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-macos.tar.gz"],
-                "sha256": "069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e",
-            }],
-        },
-    },
 }
 
