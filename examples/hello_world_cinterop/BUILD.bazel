@@ -17,5 +17,6 @@ kt_native_binary(
     name = "hello_world",
     srcs = ["HelloWorld.kt"],
     entry_point = "f.main",
+    kotlinc_opts = ["-opt-in=kotlinx.cinterop.ExperimentalForeignApi"],
     deps = [":hello_world_cinterop"],
 )

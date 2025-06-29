@@ -56,19 +56,6 @@ def _common_args(ctx, output_type):
     args.add("-no-default-libs")
     args.add("-nostdlib")
 
-    args.add("-opt-in=kotlin.RequiresOptIn")
-    args.add("-opt-in=kotlin.time.ExperimentalTime")
-    args.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
-    args.add("-opt-in=kotlinx.coroutines.FlowPreview")
-    args.add("-opt-in=kotlinx.serialization.ExperimentalSerializationApi")
-    
-    args.add("-opt-in=kotlin.experimental.ExperimentalObjCName")
-    args.add("-opt-in=kotlinx.cinterop.ExperimentalForeignApi")
-    args.add("-opt-in=kotlin.experimental.ExperimentalNativeApi")
-    
-    # TODO: find a better place for this
-    args.add("-opt-in=io.ktor.util.InternalAPI")
-
     return args
 
 def _format_compiler_plugin_option(option):
@@ -463,6 +450,7 @@ def _build_binary(ctx, extra_compiler_flags = []):
         platform_srcs = ctx.files.platform_srcs,
         deps = ctx.attr.deps,
         plugins = ctx.attr.plugins,
+        extra_compiler_flags = ctx.attr.kotlinc_opts,
     )
 
     cc_info = cc_common.merge_cc_infos(cc_infos = [dep[KotlinNativeProvider].transitive_cc_info for dep in ctx.attr.deps])
@@ -487,7 +475,7 @@ def _build_binary(ctx, extra_compiler_flags = []):
         output_type = "program",
         include = [klib],
         deps = ctx.attr.deps,
-        extra_compiler_flags = extra_compiler_flags + linker_args,
+        extra_compiler_flags = extra_compiler_flags + linker_args + ctx.attr.kotlinc_opts,
         extra_inputs = libs,
     )
 
@@ -510,7 +498,7 @@ kt_native_test = rule(
         "platform_srcs": attr.label_list(allow_files = True),
         "deps": attr.label_list(providers = [KotlinNativeProvider]),
         "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
-        "_cc_toolchain": attr.label(default = Label("@bazel_tools//tools/cpp:current_cc_toolchain")),
+        "kotlinc_opts": attr.string_list(),
     },
     test = True,
     toolchains = [NATIVE_TOOLCHAIN_TYPE, NATIVE_STDLIB_TOOLCHAIN_TYPE],
@@ -535,6 +523,7 @@ kt_native_binary = rule(
         "entry_point": attr.string(),
         "deps": attr.label_list(providers = [KotlinNativeProvider]),
         "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
+        "kotlinc_opts": attr.string_list(),
     },
     executable = True,
     toolchains = [NATIVE_TOOLCHAIN_TYPE, NATIVE_STDLIB_TOOLCHAIN_TYPE],
