@@ -1,0 +1,29 @@
+load("//kotlin_native/internal:settings.bzl", "repeatable_string_flag")
+
+repeatable_string_flag(
+    name = "kotlinc_opt",
+    build_setting_default = [],
+    visibility = ["//visibility:public"],
+)
+
+repeatable_string_flag(
+    name = "kotlinc_exec_opt",
+    build_setting_default = [],
+    visibility = ["//visibility:public"],
+)
+
+toolchain_type(
+    name = "toolchain_type",
+    visibility = ["//visibility:public"],
+)
+
+toolchain_type(
+    name = "stdlib_toolchain_type",
+    visibility = ["//visibility:public"],
+)
+
+alias(
+    name = "konanc_libraries",
+    actual = "@kotlin_native_toolchains//:konanc_libraries",
+    visibility = ["//visibility:public"],
+)

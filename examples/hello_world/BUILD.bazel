@@ -1,0 +1,6 @@
+load("@rules_kotlin_native//kotlin_native:kt_native_binary.bzl", "kt_native_binary")
+
+kt_native_binary(
+    name = "hello_world",
+    srcs = ["HelloWorld.kt"],
+)

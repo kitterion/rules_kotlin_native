@@ -1,0 +1,21 @@
+load("@rules_kotlin_native//kotlin_native:kt_native_binary.bzl", "kt_native_binary")
+load("@rules_kotlin_native//kotlin_native:kt_native_cinterop.bzl", "kt_native_cinterop")
+
+cc_library(
+    name = "hello_world_cc",
+    hdrs = ["hello_world.h"],
+    srcs = ["hello_world.c"],
+)
+
+kt_native_cinterop(
+    name = "hello_world_cinterop",
+    src = "hello_world.def",
+    deps = [":hello_world_cc"],
+)
+
+kt_native_binary(
+    name = "hello_world",
+    srcs = ["HelloWorld.kt"],
+    entry_point = "f.main",
+    deps = [":hello_world_cinterop"],
+)

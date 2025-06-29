@@ -1,0 +1,30 @@
+exports_files(["KonancWrapper.java"])
+
+java_binary(
+    name = "ksp_compiler",
+    srcs = [
+        "KspCompiler.java",
+    ],
+    main_class = "rules_kotlin_native.KspCompiler",
+    deps = [
+        "@kotlin_native_ksp//:symbol-processing-aa",
+        "@kotlin_native_ksp//:symbol-processing-api",
+        "@kotlin_native_ksp//:symbol-processing-common-deps",
+    ],
+    runtime_deps = [
+        "@rules_kotlin//kotlin/compiler:kotlin-stdlib",
+        ":kotlinx-coroutines-core-jvm",
+    ],
+    visibility = ["//kotlin_native/internal:__pkg__"],
+)
+
+# rules_kotlin exports this but declares it 'neverlink = True'.
+java_import(
+    name = "kotlinx-coroutines-core-jvm",
+    jars = [":kotlinx-coroutines-core-jvm-jar"],
+)
+
+filegroup(
+    name = "kotlinx-coroutines-core-jvm-jar",
+    srcs = ["@rules_kotlin//kotlin/compiler:kotlinx-coroutines-core-jvm"],
+)
