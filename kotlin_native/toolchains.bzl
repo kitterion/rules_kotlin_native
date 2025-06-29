@@ -149,15 +149,11 @@ kotlin_native_toolchain = rule(
 def _kotlin_native_stdlib_toolchain_impl(ctx):
     files = depset(transitive = [library[_KtNativeStdlibInfo].files for library in ctx.attr.default_libraries])
     paths = depset(transitive = [library[_KtNativeStdlibInfo].paths for library in ctx.attr.default_libraries])
-    cache_files = depset(transitive = [library[_KtNativeStdlibInfo].cache_files for library in ctx.attr.default_libraries])
-    cache_mappings = depset(transitive = [library[_KtNativeStdlibInfo].cache_mappings for library in ctx.attr.default_libraries])
 
     return [
         platform_common.ToolchainInfo(
             files = files,
             paths = paths,
-            cache_files = cache_files,
-            cache_mappings = cache_mappings,
         ),
     ]
 

@@ -56,17 +56,11 @@ def _kt_native_cinterop_impl(ctx):
         executable = ctx.toolchains["//kotlin_native:toolchain_type"].konanc.files_to_run,
     )
 
-    # cache = _make_cache_from_klib(ctx, name = module_name, klib = klib, deps = [dep for dep in ctx.attr.deps if KotlinNativeProvider in dep])
-
     provider = KotlinNativeProvider(
         klib = klib,
         header_klibs = depset([klib]),
         transitive_klibs = depset([klib]),
         transitive_cc_info = cc_info,
-        # transitive_cache_files = depset(cache.outputs),
-        # transitive_cache_mapping = depset([cache.cache_mapping]),
-        transitive_cache_files = depset([]),
-        transitive_cache_mapping = depset([]),
     )
 
     return [

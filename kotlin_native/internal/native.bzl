@@ -99,29 +99,9 @@ def _extract_srcjars(ctx, srcjars):
 def _import_default_library_impl(ctx):
     inputs = depset(ctx.files.srcs, transitive = [dep[KtNativeStdlibInfo].files for dep in ctx.attr.deps])
 
-    transitive_cache_files = depset(transitive = [dep[KtNativeStdlibInfo].cache_files for dep in ctx.attr.deps])
-    transitive_cache_mappings = depset(transitive = [dep[KtNativeStdlibInfo].cache_mappings for dep in ctx.attr.deps])
-
-    cache = _make_cached_files(
-        ctx = ctx,
-        name = ctx.label.name,
-        path = ctx.file.path,
-        inputs = inputs,
-        cache_files = transitive_cache_files,
-        cache_mappings = transitive_cache_mappings,
-        is_default = True,
-    )
-
-    new_cache_mapping = struct(
-        klib = ctx.file.path,
-        cache_path = cache.cache_path,
-    )
-
     return [KtNativeStdlibInfo(
         files = inputs,
         paths = depset([ctx.file.path], transitive = [dep[KtNativeStdlibInfo].paths for dep in ctx.attr.deps]),
-        cache_files = depset(cache.outputs, transitive = [transitive_cache_files]),
-        cache_mappings = depset([new_cache_mapping], transitive = [transitive_cache_mappings]),
     )]
 
 
@@ -134,82 +114,6 @@ import_default_library = rule(
     },
     toolchains = [NATIVE_TOOLCHAIN_TYPE],
 )
-
-def cache_mapping_to_string(cache_mapping):
-    return "%s,%s" % (cache_mapping.klib.path, cache_mapping.cache_path)
-
-def _make_cached_files(ctx, name, path, inputs, cache_mappings, cache_files = depset(), klib_deps = depset(), is_default = False):
-    args = _common_args(ctx, "static_cache")
-
-    args.add(path, format = "-Xadd-cache=%s")
-
-    # "-cache" suffix is required by k/n compiler.
-    # See https://github.com/JetBrains/kotlin/blob/v1.6.21/kotlin-native/backend.native/compiler/ir/backend.native/src/org/jetbrains/kotlin/backend/konan/CachedLibraries.kt#L106
-    cached_bitcode_deps = ctx.actions.declare_file("{}-cache/bitcode_deps".format(name))
-    cached_class_fields = ctx.actions.declare_file("{}-cache/class_fields".format(name))
-    cached_inline_bodies = ctx.actions.declare_file("{}-cache/inline_bodies".format(name))
-    cached_library = ctx.actions.declare_file("{0}-cache/lib{0}-cache.a".format(name))
-
-    outputs = [cached_bitcode_deps, cached_class_fields, cached_inline_bodies, cached_library]
-
-    cache_path = cached_library.dirname
-    # args.add("-output", cache_path)
-    args.add(cache_path, format = "-Xcache-directory=%s")
-
-    # transitive_klibs = depset(transitive = [dep[KotlinNativeProvider].transitive_klibs for dep in deps])
-    args.add_all(klib_deps, before_each = "-library")
-
-    # transitive_cache_files = depset(transitive = [dep[KotlinNativeProvider].transitive_cache_files for dep in deps])
-    # transitive_cache_mapping = depset(transitive = [dep[KotlinNativeProvider].transitive_cache_mapping for dep in deps])
-    args.add_all(cache_mappings, map_each = cache_mapping_to_string, format_each = "-Xcached-library=%s")
-
-    extra_inputs = []
-    if is_default:
-        args.add("-no-default-libs")
-    else:
-        extra_inputs.append(ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].files)
-        extra_inputs.append(ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].cache_files)
-
-        args.add_all(ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].cache_mappings, map_each = cache_mapping_to_string, format_each = "-Xcached-library=%s")
-
-    ctx.actions.run(
-        outputs = outputs,
-        inputs = depset(
-            ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].dependencies,
-            transitive = [inputs, cache_files, klib_deps] + extra_inputs,
-        ),
-        mnemonic = "KotlinNativeCompileToCache",
-        progress_message = "Caching Kotlin/Native module %{label}",
-        env = {
-            "KONAN_DATA_DIR": ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].data_dir.path,
-        },
-        arguments = ["konanc", args],
-        executable = ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].konanc.files_to_run,
-    )
-
-    return struct(
-        outputs = outputs,
-        cache_path = cache_path,
-    )
-
-def _make_cache_from_klib(ctx, klib, deps, name = None):
-    result = _make_cached_files(
-        ctx = ctx,
-        name = name or ctx.label.name,
-        path = klib,
-        inputs = depset([klib]),
-        klib_deps = depset(transitive = [dep[KotlinNativeProvider].header_klibs for dep in deps]),
-        cache_mappings = depset(transitive = [dep[KotlinNativeProvider].transitive_cache_mapping for dep in deps]),
-        cache_files = depset(transitive = [dep[KotlinNativeProvider].transitive_cache_files for dep in deps]),
-    )
-
-    return struct(
-        outputs = result.outputs,
-        cache_mapping = struct(
-            klib = klib,
-            cache_path = result.cache_path
-        )
-    )
 
 def _to_path(file):
     return file.path
@@ -384,17 +288,6 @@ def _kt_native_library_impl(ctx):
         extra_compiler_flags = ctx.attr.kotlinc_opts,
     )
 
-    cache = _make_cache_from_klib(ctx, name = module_name, klib = klib, deps = ctx.attr.deps)
-
-    provider = KotlinNativeProvider(
-        klib = klib,
-        header_klibs = depset([header_klib], transitive = [dep[KotlinNativeProvider].header_klibs for dep in ctx.attr.deps]),
-        transitive_klibs = depset([klib], transitive = [dep[KotlinNativeProvider].transitive_klibs for dep in ctx.attr.deps]),
-        transitive_cc_info = cc_common.merge_cc_infos(cc_infos = [dep[KotlinNativeProvider].transitive_cc_info for dep in ctx.attr.deps]),
-        transitive_cache_files = depset(cache.outputs, transitive = [dep[KotlinNativeProvider].transitive_cache_files for dep in ctx.attr.deps]),
-        transitive_cache_mapping = depset([cache.cache_mapping], transitive = [dep[KotlinNativeProvider].transitive_cache_mapping for dep in ctx.attr.deps]),
-    )
-
     return [DefaultInfo(files = depset([klib])), provider]
 
 kt_native_library = rule(
@@ -416,20 +309,11 @@ kt_native_library = rule(
 )
 
 def _kt_native_import_impl(ctx):
-    cache = _make_cache_from_klib(
-        ctx,
-        name = ctx.attr.module_name or ctx.label.name,
-        klib = ctx.file.klib,
-        deps = ctx.attr.deps,
-    )
-
     return [KotlinNativeProvider(
         klib = ctx.file.klib,
         header_klibs = depset([ctx.file.klib], transitive = [dep[KotlinNativeProvider].header_klibs for dep in ctx.attr.deps]),
         transitive_klibs = depset([ctx.file.klib], transitive = [dep[KotlinNativeProvider].transitive_klibs for dep in ctx.attr.deps]),
         transitive_cc_info = CcInfo(),
-        transitive_cache_files = depset(cache.outputs, transitive = [dep[KotlinNativeProvider].transitive_cache_files for dep in ctx.attr.deps]),
-        transitive_cache_mapping = depset([cache.cache_mapping], transitive = [dep[KotlinNativeProvider].transitive_cache_mapping for dep in ctx.attr.deps]),
     )]
 
 kt_native_import = rule(
@@ -468,12 +352,6 @@ def _kt_native_static_framework_impl(ctx):
     transitive_klibs = depset(transitive = [dep[KotlinNativeProvider].transitive_klibs for dep in ctx.attr.deps])
     args.add_all(transitive_klibs, before_each = "-library")
 
-    # transitive_cache_files = depset(transitive = [dep[KotlinNativeProvider].transitive_cache_files for dep in ctx.attr.deps])
-    # transitive_cache_mapping = depset(transitive = [dep[KotlinNativeProvider].transitive_cache_mapping for dep in ctx.attr.deps])
-    # args.add_all(transitive_cache_mapping, map_each = cache_mapping_to_string, format_each = "-Xcached-library=%s")
-    # 
-    # args.add_all(ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].cache_mappings, map_each = cache_mapping_to_string, format_each = "-Xcached-library=%s")
-
     direct_klibs = [dep[KotlinNativeProvider].klib for dep in ctx.attr.deps]
     args.add_all(direct_klibs, format_each = "-Xexport-library=%s")
 
@@ -495,7 +373,6 @@ def _kt_native_static_framework_impl(ctx):
             ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].dependencies + srcs + direct_klibs,
             transitive = [
                 transitive_klibs, ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].files,
-                # transitive_cache_files, ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].cache_files,
             ],
         ),
         mnemonic = "KotlinNativeLink",
@@ -516,7 +393,6 @@ def _kt_native_static_framework_impl(ctx):
             ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].dependencies + srcs + direct_klibs,
             transitive = [
                 transitive_klibs, ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].files,
-                # transitive_cache_files, ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].cache_files,
             ],
         ),
         mnemonic = "KotlinNativeLinkHeaders",
