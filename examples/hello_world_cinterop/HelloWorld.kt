@@ -1,5 +1,3 @@
-package f
-
 import platform.hello_world.hello_world
 
 fun main() {
