@@ -379,6 +379,7 @@ _PLATFORMS = {
 }
 
 _DOWNLOAD_PLATFORM_MAPPING = {
+    "linux-x86_64": "linux_x64",
     "macos-aarch64": "macos_arm64",
     "macos-x86_64": "macos_x64",
 }
