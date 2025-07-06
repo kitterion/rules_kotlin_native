@@ -1,5 +1,8 @@
 # Bazel Kotlin Native rules
 
+> [!IMPORTANT]
+> These rules are in a bit of a rough state. They work for my needs but lack proper documentation and certain features. Pull requests are welcome!
+
 ## Installation
 
 Only bzlmod is supported right now. Pick the latest commit and add the following to your MODULE.bazel file
@@ -29,6 +32,10 @@ kotlin_native.toolchain(
 ```
 
 # Overview
+
+The rules have have been written with toolchains and platforms in mind. Linux and macos should work, windows has not been tested (sorry, windows users).
+
+Remote caching has been tested to work. Remote execution *might* work but is untested.
 
 Supported rules are:
 - `kt_native_library`
@@ -76,6 +83,19 @@ Supported rules are:
       deps = [
           "//lib_a",
           "//lib_b",
+      ],
+  )
+  ```
+- `kt_native_import`. Import a prebuilt .klib file.
+  ```python
+  load("@rules_kotlin_native//kotlin_native:kt_native_import.bzl", "kt_native_import")
+
+  kt_native_import(
+      name = "",
+      klib = "file.klib",
+      # Just like with java_import, deps get propagated to the targets that depend on this one.
+      deps = [
+          ...
       ],
   )
   ```
