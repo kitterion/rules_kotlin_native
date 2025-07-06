@@ -11,7 +11,7 @@ Only bzlmod is supported right now. Pick the latest commit and add the following
 bazel_dep(name = "rules_kotlin_native")
 archive_override(
     module_name = "rules_kotlin_native",
-    url = "https://github.com/bazelbuild/rules_kotlin/archive/<commit>.zip",
+    url = "https://github.com/kitterion/rules_kotlin_native/archive/<commit>.zip",
     strip_prefix = "rules_kotlin_native-<commit>",
 )
 ```
