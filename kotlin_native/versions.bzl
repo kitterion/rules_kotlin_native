@@ -119,5 +119,73 @@ VERSIONS = {
             }],
         },
     },
+    "2.2.21": {
+        "linux-x86_64": {
+            "targets": [
+                "android_arm32",
+                "android_arm64",
+                "android_x64",
+                "android_x86",
+                "linux_arm32_hfp",
+                "linux_arm64",
+                "linux_x64",
+                "mingw_x64",
+            ],
+            "sha256": "a135baa9ef92925c5c2aef20c1cf036734ca8fe2fae5db986173beb96a7a81f8",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/x86_64-unknown-linux-gnu-gcc-8.3.0-glibc-2.19-kernel-4.9-2.tar.gz"],
+                "sha256": "a048397d50fb5a2bd6cc0f89d5a30e0b8ff0373ebff9c1d78ce1f1fb7f185a50",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-linux.tar.gz"],
+                "sha256": "b1e145c859f44071f66231cfc98c8c16a480cbf47139fcd5dd2df4bf041fdfda",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/19-x86_64-linux/llvm-19-x86_64-linux-essentials-103.tar.gz"],
+                "sha256": "c4567001682a937d4898c52991173cd705aba52113ed758a1901986c42b560b2",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.2.1-2-linux-x86-64.tar.gz"],
+                "sha256": "9d817bbca098a2fa0f1d5a8b9e57674c30d100bb4c6aeceff18d8acc5b9f382c",
+            }],
+        },
+        "macos-x86_64": {
+            "targets": [
+                "ios_x64",
+                "ios_arm64",
+                "ios_simulator_arm64",
+                "macos_x64",
+                "macos_arm64",
+            ],
+            "sha256": "0c1494b855cbd0ea519ddbb59d1618f11cefcfd257ca557b2b75877c892dad0d",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.2.1-3-darwin-macos.tar.gz"],
+                "sha256": "b83357b2d4ad4be9d5466ac3cbf12570928d84109521ab687672ec8ef47d9edc",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/19-x86_64-macos/llvm-19-x86_64-macos-essentials-75.tar.gz"],
+                "sha256": "e6d59db5475822013eea9b88b5c4e73fc95d1537472f777402371a15976c69af",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-macos.tar.gz"],
+                "sha256": "069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e",
+            }],
+        },
+        "macos-aarch64": {
+            "targets": [
+                "ios_x64",
+                "ios_arm64",
+                "ios_simulator_arm64",
+                "macos_x64",
+                "macos_arm64",
+            ],
+            "sha256": "3a35d8ebec146370ad3416e25dcd61e63d31b02642d2f5639b54a370a7b31134",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.3-1-macos-arm64.tar.gz"],
+                "sha256": "8ca0102ad5b626e8b1699f311ab098354a90154ea3e44951f28ebdd256862ba9",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/19-aarch64-macos/llvm-19-aarch64-macos-essentials-79.tar.gz"],
+                "sha256": "333efdd5f3cd94deb5b115c0135679e9ef876406b09d36531d1fe90d1118affb",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-macos.tar.gz"],
+                "sha256": "069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e",
+            }],
+        },
+    },
 }
 

@@ -20,12 +20,12 @@ archive_override(
 
 You can customize the compiler version, the language version and the api version. See for example [here](https://kotlinlang.org/docs/compatibility-modes.html) for an explanation.
 
-Note, that currently only a few compiler versions can be specified (2.0.21 and 2.1.21). Kotlin Native compiler has a few host-specific dependencies that it downloads on the first launch which doesn't quite work with bazel. To side-step this and to integrate with the bazel downloader, these dependencies are currently manually specified for each known compiler version. There are plans to support other versions including versions unknown to rules\_kotlin\_native.
+Note, that currently only a few compiler versions can be specified (2.0.21, 2.1.21 and 2.2.21). Kotlin Native compiler has a few host-specific dependencies that it downloads on the first launch which doesn't quite work with bazel. To side-step this and to integrate with the bazel downloader, these dependencies are currently manually specified for each known compiler version. There are plans to support other versions including versions unknown to rules\_kotlin\_native.
 
 ```python
 kotlin_native = use_extension("@rules_kotlin_native//kotlin_native:extensions.bzl", "kotlin_native")
 kotlin_native.toolchain(
-    version = "2.1.21",
+    version = "2.2.21",
     language_version = "2.0",
     api_version = "2.0",
 )
