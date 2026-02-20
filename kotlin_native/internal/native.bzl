@@ -353,11 +353,23 @@ def _kt_native_static_framework_impl(ctx):
     direct_klibs = [dep[KotlinNativeProvider].klib for dep in ctx.attr.deps]
     args.add_all(direct_klibs, format_each = "-Xexport-library=%s")
 
-    srcs = ctx.attr.srcs or []
+    srcs_klib = []
+    if ctx.files.srcs:
+        klib = ctx.actions.declare_file(ctx.label.name + ".klib")
+        _compile(
+            ctx,
+            output = klib,
+            output_type = "library",
+            srcs = ctx.files.srcs,
+            platform_srcs = ctx.files.platform_srcs,
+            deps = ctx.attr.deps,
+            plugins = ctx.attr.plugins,
+            extra_compiler_flags = ctx.attr.kotlinc_opts,
+        )
 
-    args.add_all(srcs)
+        srcs_klib = [klib]
+        args.add(klib, format="-Xinclude=%s")
 
-    args.add("-generate-no-exit-test-runner")
     args.add("-Xkonan-data-dir=" + ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].data_dir.path)
 
     args.add_all(ctx.attr.kotlinc_opts)
@@ -368,7 +380,7 @@ def _kt_native_static_framework_impl(ctx):
     ctx.actions.run(
         outputs = [output_binary],
         inputs = depset(
-            ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].dependencies + srcs + direct_klibs,
+            ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].dependencies + srcs_klib + direct_klibs,
             transitive = [
                 transitive_klibs, ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].files,
             ],
@@ -388,7 +400,7 @@ def _kt_native_static_framework_impl(ctx):
     ctx.actions.run(
         outputs = [output_header, output_modulemap],
         inputs = depset(
-            ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].dependencies + srcs + direct_klibs,
+            ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].dependencies + srcs_klib + direct_klibs,
             transitive = [
                 transitive_klibs, ctx.toolchains[NATIVE_STDLIB_TOOLCHAIN_TYPE].files,
             ],
@@ -443,6 +455,7 @@ kt_native_static_framework = rule(
         "data": attr.label_list(allow_files = True),
         "deps": attr.label_list(mandatory = True, providers = [KotlinNativeProvider]),
         "bundle_name": attr.string(),
+        "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
         "kotlinc_opts": attr.string_list(),
     },
     toolchains = [NATIVE_TOOLCHAIN_TYPE, NATIVE_STDLIB_TOOLCHAIN_TYPE],
