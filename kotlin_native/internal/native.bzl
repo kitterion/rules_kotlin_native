@@ -176,6 +176,7 @@ def _compile(
     plugins = [],
     extra_compiler_flags = [],
     extra_inputs = [],
+    use_header_klibs = True,
 ):
     args = _common_args(ctx, output_type)
 
@@ -185,8 +186,11 @@ def _compile(
     args.add("-output", output)
     outputs = [output]
 
-    # deps_klibs = depset(transitive = [dep[KotlinNativeProvider].transitive_klibs for dep in deps])
-    deps_klibs = depset(transitive = [dep[KotlinNativeProvider].header_klibs for dep in deps])
+    if use_header_klibs:
+        deps_klibs = depset(transitive = [dep[KotlinNativeProvider].header_klibs for dep in deps])
+    else:
+        deps_klibs = depset(transitive = [dep[KotlinNativeProvider].transitive_klibs for dep in deps])
+
     args.add_all(deps_klibs, before_each = "-library")
 
     args.add_all(include, format_each = "-Xinclude=%s")
@@ -262,7 +266,7 @@ def _compile(
 def _kt_native_library_impl(ctx):
     klib = ctx.actions.declare_file("{}.klib".format(ctx.label.name))
     header_klib = ctx.actions.declare_file("{}.header.klib".format(ctx.label.name))
-    module_name = _compile(
+    _compile(
         ctx = ctx,
         output = klib,
         header_output = header_klib,
@@ -273,6 +277,13 @@ def _kt_native_library_impl(ctx):
         module_name = ctx.attr.module_name,
         plugins = ctx.attr.plugins,
         extra_compiler_flags = ctx.attr.kotlinc_opts,
+    )
+
+    provider = KotlinNativeProvider(
+        klib = klib,
+        header_klibs = depset([header_klib], transitive = [dep[KotlinNativeProvider].header_klibs for dep in ctx.attr.deps]),
+        transitive_klibs = depset([klib], transitive = [dep[KotlinNativeProvider].transitive_klibs for dep in ctx.attr.deps]),
+        transitive_cc_info = cc_common.merge_cc_infos(cc_infos = [dep[KotlinNativeProvider].transitive_cc_info for dep in ctx.attr.deps]),
     )
 
     return [DefaultInfo(files = depset([klib])), provider]
@@ -477,6 +488,7 @@ def _build_binary(ctx, extra_compiler_flags = []):
         deps = ctx.attr.deps,
         extra_compiler_flags = extra_compiler_flags + linker_args + ctx.attr.kotlinc_opts,
         extra_inputs = libs,
+        use_header_klibs = False,
     )
 
     return binary
