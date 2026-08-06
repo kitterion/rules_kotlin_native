@@ -78,8 +78,10 @@ _kt_native_toolchain_proxy = repository_rule(
 )
 
 _NATIVE = """
-load("@rules_kotlin_native//kotlin_native:toolchains.bzl", "kotlin_native_toolchain", "kotlin_native_stdlib_toolchain")
+load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_java//java:java_import.bzl", "java_import")
 load("@rules_kotlin_native//kotlin_native/internal:native.bzl", "import_default_library")
+load("@rules_kotlin_native//kotlin_native:toolchains.bzl", "kotlin_native_toolchain", "kotlin_native_stdlib_toolchain")
 
 java_import(
     name = "konanc_libraries",

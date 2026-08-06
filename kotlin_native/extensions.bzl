@@ -23,6 +23,8 @@ def _kotlin_native_impl(module_ctx):
         urls = ["https://github.com/google/ksp/releases/download/%s/artifacts.zip" % version],
         integrity = "sha256-ROlluwZ7K7XNkYTassPepuPqt0fTQcB2RbtMiPCeScg=",
         build_file_content = """\
+load("@rules_java//java:java_import.bzl", "java_import")
+
 FILES = [
     "symbol-processing-aa",
     "symbol-processing-aa-embeddable",

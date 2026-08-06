@@ -1,6 +1,8 @@
-load("@build_bazel_rules_swift//swift:swift.bzl", "SwiftInfo")
-load("@rules_kotlin//kotlin/internal/utils:utils.bzl", _utils = "utils")
 load("//kotlin_native/internal:providers.bzl", "KotlinNativeProvider")
+load("@build_bazel_rules_swift//swift:swift.bzl", "SwiftInfo")
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
+load("@rules_kotlin//kotlin/internal/utils:utils.bzl", _utils = "utils")
 
 def _kt_native_cinterop_impl(ctx):
     module_name = ctx.attr.module_name or _utils.derive_module_name(ctx)

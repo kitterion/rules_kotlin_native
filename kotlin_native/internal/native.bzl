@@ -1,7 +1,11 @@
-load("@rules_kotlin//kotlin/internal/utils:utils.bzl", _utils = "utils")
-load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@rules_kotlin//kotlin/internal:defs.bzl", "KtCompilerPluginInfo")
 load("//kotlin_native/internal:providers.bzl", "KtNativeStdlibInfo", "KotlinNativeProvider", "KspInfo")
+load("@bazel_skylib//lib:paths.bzl", "paths")
+load("@build_bazel_rules_swift//swift:swift_interop_info.bzl", "create_swift_interop_info")
+load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
+load("@rules_java//java/common:java_info.bzl", "JavaInfo")
+load("@rules_kotlin//kotlin/internal/utils:utils.bzl", _utils = "utils")
+load("@rules_kotlin//kotlin/internal:defs.bzl", "KtCompilerPluginInfo")
 
 NATIVE_TOOLCHAIN_TYPE = "//kotlin_native:toolchain_type"
 NATIVE_STDLIB_TOOLCHAIN_TYPE = "//kotlin_native:stdlib_toolchain_type"
@@ -437,6 +441,10 @@ def _kt_native_static_framework_impl(ctx):
     return [
         DefaultInfo(files = depset([output_header, output_binary, output_modulemap])),
         apple_common.new_objc_provider(),
+        create_swift_interop_info(
+            module_name = framework_name,
+            module_map = output_modulemap,
+        ),
         CcInfo(
             compilation_context = cc_common.create_compilation_context(
                 headers = depset([output_header]),
