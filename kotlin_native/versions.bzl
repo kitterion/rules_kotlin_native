@@ -187,5 +187,127 @@ VERSIONS = {
             }],
         },
     },
+    "2.3.21": {
+        "linux-x86_64": {
+            "targets": [
+                "linux_x64",
+            ],
+            "sha256": "5c1b6b95d181ce8982e13c0b74b56d80032f008da8b7e8742ab7676e480d60e3",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/x86_64-unknown-linux-gnu-gcc-8.3.0-glibc-2.19-kernel-4.9-2.tar.gz"],
+                "sha256": "a048397d50fb5a2bd6cc0f89d5a30e0b8ff0373ebff9c1d78ce1f1fb7f185a50",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-linux.tar.gz"],
+                "sha256": "b1e145c859f44071f66231cfc98c8c16a480cbf47139fcd5dd2df4bf041fdfda",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/19-x86_64-linux/llvm-19-x86_64-linux-essentials-109.tar.gz"],
+                "sha256": "bf4ea893243ed724ce8c31b9a4a43c51cbd92fdcc66f4f18e5670d1ae5d832c7",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.2.1-2-linux-x86-64.tar.gz"],
+                "sha256": "9d817bbca098a2fa0f1d5a8b9e57674c30d100bb4c6aeceff18d8acc5b9f382c",
+            }],
+        },
+        "macos-x86_64": {
+            "targets": [
+                "ios_x64",
+                "ios_arm64",
+                "ios_simulator_arm64",
+                "macos_x64",
+                "macos_arm64",
+            ],
+            "sha256": "0b686a9e5848f174c4a4a0a68a4b1f4d2b508410be7a93d473c8d7663c86ba6c",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.2.1-3-darwin-macos.tar.gz"],
+                "sha256": "b83357b2d4ad4be9d5466ac3cbf12570928d84109521ab687672ec8ef47d9edc",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/19-x86_64-macos/llvm-19-x86_64-macos-essentials-77.tar.gz"],
+                "sha256": "d6582a9cfe28f33eaa8629bc1a3dae6419238b73ec0efcc58ea6bcebb23291b9",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-macos.tar.gz"],
+                "sha256": "069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e",
+            }],
+        },
+        "macos-aarch64": {
+            "targets": [
+                "ios_x64",
+                "ios_arm64",
+                "ios_simulator_arm64",
+                "macos_x64",
+                "macos_arm64",
+            ],
+            "sha256": "5418391a3b94d7bff6794668c8e813ebc471f46e04f828a35e88469c367efa4d",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.3-1-macos-arm64.tar.gz"],
+                "sha256": "8ca0102ad5b626e8b1699f311ab098354a90154ea3e44951f28ebdd256862ba9",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/19-aarch64-macos/llvm-19-aarch64-macos-essentials-81.tar.gz"],
+                "sha256": "06991994f4d42dd0229c91cf339ef5353519d8160b52a9b54812e74915d10a87",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-macos.tar.gz"],
+                "sha256": "069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e",
+            }],
+        },
+    },
+    "2.4.10": {
+        "linux-x86_64": {
+            "targets": [
+                "linux_x64",
+            ],
+            "sha256": "c9e356e8518144f275f1514cfe38b07db949f93e47e054832b8974fff1fd33e0",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/x86_64-unknown-linux-gnu-gcc-8.3.0-glibc-2.19-kernel-4.9-2.tar.gz"],
+                "sha256": "a048397d50fb5a2bd6cc0f89d5a30e0b8ff0373ebff9c1d78ce1f1fb7f185a50",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-linux.tar.gz"],
+                "sha256": "b1e145c859f44071f66231cfc98c8c16a480cbf47139fcd5dd2df4bf041fdfda",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/21-x86_64-linux/llvm-21-x86_64-linux-essentials-116.tar.gz"],
+                "sha256": "0b1f290214dd7ec20e2506210967e0ebd735cdefc3a3b4485bbccb439fa78e5b",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.2.1-2-linux-x86-64.tar.gz"],
+                "sha256": "9d817bbca098a2fa0f1d5a8b9e57674c30d100bb4c6aeceff18d8acc5b9f382c",
+            }],
+        },
+        "macos-x86_64": {
+            "targets": [
+                "ios_x64",
+                "ios_arm64",
+                "ios_simulator_arm64",
+                "macos_x64",
+                "macos_arm64",
+            ],
+            "sha256": "55ded039bb56a69aec9df354a92b42df9e916104e3c53d8d9852d9cc6617ed9d",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.2.1-3-darwin-macos.tar.gz"],
+                "sha256": "b83357b2d4ad4be9d5466ac3cbf12570928d84109521ab687672ec8ef47d9edc",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/21-x86_64-macos/llvm-21-x86_64-macos-essentials-83.tar.gz"],
+                "sha256": "8e748d65d60601582db2043b1947f10495c65fd2835011342a843cddf9cd387b",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-macos.tar.gz"],
+                "sha256": "069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e",
+            }],
+        },
+        "macos-aarch64": {
+            "targets": [
+                "ios_x64",
+                "ios_arm64",
+                "ios_simulator_arm64",
+                "macos_x64",
+                "macos_arm64",
+            ],
+            "sha256": "7bfda60c2a4ce859fc85011ea2c3229961b1eb40e9cc0b6b85fee885f23973cb",
+            "dependencies": [{
+                "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.3-1-macos-arm64.tar.gz"],
+                "sha256": "8ca0102ad5b626e8b1699f311ab098354a90154ea3e44951f28ebdd256862ba9",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/resources/llvm/21-aarch64-macos/llvm-21-aarch64-macos-essentials-97.tar.gz"],
+                "sha256": "62fd78f090353aa7b2c6601ad6f95bd7a0b0558b18f86978043cc878321b408a",
+            }, {
+                "urls": ["https://download.jetbrains.com/kotlin/native/lldb-4-macos.tar.gz"],
+                "sha256": "069193359103d4e4a4653f236e7a963e266a4a366905e858d4a68e701f43866e",
+            }],
+        },
+    },
 }
 

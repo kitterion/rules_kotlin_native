@@ -114,7 +114,8 @@ kotlin_native_toolchain(
     data_dir = ".",
     dependencies = ["konan/konan.properties", ":dependencies"] + glob([
         "konan/targets/{kotlin_target}/**",
-    ]),
+        "konan/nativelib/*",
+    ], allow_empty=True),
 )
 
 kotlin_native_stdlib_toolchain(
@@ -392,7 +393,7 @@ def kt_native_register_toolchains(
     api_version = None,
     native_compilers = _VERSIONS,
 ):
-    version = version or "2.2.21"
+    version = version or "2.4.10"
     major_minor_version = ".".join(version.split(".", 2)[0:2])
     language_version = language_version or major_minor_version
     api_version = api_version or language_version
