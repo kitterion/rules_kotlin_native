@@ -1,7 +1,28 @@
+load(":konanc_libraries.bzl", "konanc_libraries")
 load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_java//java:java_import.bzl", "java_import")
 
 exports_files(["KonancWrapper.java"])
+
+java_binary(
+    name = "konanc",
+    srcs = ["KonancWrapper.java"],
+    main_class = "rules_kotlin_native.KonancWrapper",
+    args = ["konanc"],
+    deps = [
+        ":konanc_libraries",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+java_import(
+    name = "konanc_libraries",
+    jars = [":konanc_libraries_from_toolchain"],
+)
+
+konanc_libraries(
+    name = "konanc_libraries_from_toolchain",
+)
 
 java_binary(
     name = "ksp_compiler",

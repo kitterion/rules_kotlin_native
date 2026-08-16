@@ -55,7 +55,7 @@ def _kt_native_cinterop_impl(ctx):
             "KONAN_DATA_DIR": ctx.toolchains["//kotlin_native:toolchain_type"].data_dir.path,
         },
         arguments = [args],
-        executable = ctx.toolchains["//kotlin_native:toolchain_type"].konanc.files_to_run,
+        executable = ctx.executable._konanc,
     )
 
     provider = KotlinNativeProvider(
@@ -79,6 +79,11 @@ kt_native_cinterop = rule(
         "module_name": attr.string(),
         "deps": attr.label_list(providers = [[CcInfo], [KotlinNativeProvider]]),
         "copts": attr.string_list(),
+        "_konanc": attr.label(
+            default = "//tools:konanc",
+            executable = True,
+            cfg = "exec",
+        ),
     },
     toolchains = ["//kotlin_native:toolchain_type"],
 )

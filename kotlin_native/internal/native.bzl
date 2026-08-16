@@ -262,7 +262,7 @@ def _compile(
             "KONAN_DATA_DIR": ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].data_dir.path,
         },
         arguments = ["konanc", args],
-        executable = ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].konanc.files_to_run,
+        executable = ctx.executable._konanc,
     )
 
     return module_name
@@ -303,6 +303,11 @@ kt_native_library = rule(
         "kotlinc_opts": attr.string_list(),
         "_ksp_compiler": attr.label(
             default = "//tools:ksp_compiler",
+            executable = True,
+            cfg = "exec",
+        ),
+        "_konanc": attr.label(
+            default = "//tools:konanc",
             executable = True,
             cfg = "exec",
         ),
@@ -395,7 +400,7 @@ def _kt_native_static_framework_impl(ctx):
             "KONAN_DATA_DIR": ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].data_dir.path,
         },
         arguments = ["konanc", args],
-        executable = ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].konanc.files_to_run,
+        executable = ctx.executable._konanc,
     )
 
     args.add("-Xomit-framework-binary")
@@ -415,7 +420,7 @@ def _kt_native_static_framework_impl(ctx):
             "KONAN_DATA_DIR": ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].data_dir.path,
         },
         arguments = ["konanc", args],
-        executable = ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].konanc.files_to_run,
+        executable = ctx.executable._konanc,
     )
 
     library_to_link = cc_common.create_library_to_link(
@@ -465,6 +470,11 @@ kt_native_static_framework = rule(
         "bundle_name": attr.string(),
         "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
         "kotlinc_opts": attr.string_list(),
+        "_konanc": attr.label(
+            default = "//tools:konanc",
+            executable = True,
+            cfg = "exec",
+        ),
     },
     toolchains = [NATIVE_TOOLCHAIN_TYPE, NATIVE_STDLIB_TOOLCHAIN_TYPE],
 )
@@ -532,6 +542,11 @@ kt_native_test = rule(
         "deps": attr.label_list(providers = [KotlinNativeProvider]),
         "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
         "kotlinc_opts": attr.string_list(),
+        "_konanc": attr.label(
+            default = "//tools:konanc",
+            executable = True,
+            cfg = "exec",
+        ),
     },
     test = True,
     toolchains = [NATIVE_TOOLCHAIN_TYPE, NATIVE_STDLIB_TOOLCHAIN_TYPE],
@@ -557,6 +572,11 @@ kt_native_binary = rule(
         "deps": attr.label_list(providers = [KotlinNativeProvider]),
         "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
         "kotlinc_opts": attr.string_list(),
+        "_konanc": attr.label(
+            default = "//tools:konanc",
+            executable = True,
+            cfg = "exec",
+        ),
     },
     executable = True,
     toolchains = [NATIVE_TOOLCHAIN_TYPE, NATIVE_STDLIB_TOOLCHAIN_TYPE],

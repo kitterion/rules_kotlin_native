@@ -78,24 +78,14 @@ _kt_native_toolchain_proxy = repository_rule(
 )
 
 _NATIVE = """
-load("@rules_java//java:java_binary.bzl", "java_binary")
-load("@rules_java//java:java_import.bzl", "java_import")
 load("@rules_kotlin_native//kotlin_native/internal:native.bzl", "import_default_library")
 load("@rules_kotlin_native//kotlin_native:toolchains.bzl", "kotlin_native_toolchain", "kotlin_native_stdlib_toolchain")
 
-java_import(
+filegroup(
     name = "konanc_libraries",
-    jars = glob([
+    srcs = glob([
         "konan/lib/*.jar",
     ]),
-    visibility = ["//visibility:public"],
-)
-
-java_binary(
-    name = "konanc",
-    srcs = ["@rules_kotlin_native//tools:KonancWrapper.java"],
-    main_class = "rules_kotlin_native.KonancWrapper",
-    deps = [":konanc_libraries"],
 )
 
 filegroup(
@@ -109,7 +99,7 @@ kotlin_native_toolchain(
     name = "toolchain_{kotlin_target}",
     language_version = "{language_version}",
     api_version = "{api_version}",
-    konanc = ":konanc",
+    konanc_libraries = [":konanc_libraries"],
     kotlin_target = "{kotlin_target}",
     data_dir = ".",
     dependencies = ["konan/konan.properties", ":dependencies"] + glob([
@@ -127,7 +117,7 @@ kotlin_native_stdlib_toolchain(
 def _kotlin_native_toolchain_impl(ctx):
     return [
         platform_common.ToolchainInfo(
-            konanc = ctx.attr.konanc,
+            konanc_libraries = ctx.files.konanc_libraries,
             kotlin_target = ctx.attr.kotlin_target,
             data_dir = ctx.file.data_dir,
             dependencies = ctx.files.dependencies,
@@ -140,7 +130,7 @@ kotlin_native_toolchain = rule(
     implementation = _kotlin_native_toolchain_impl,
     provides = [platform_common.ToolchainInfo],
     attrs = {
-        "konanc": attr.label(mandatory = True, executable = True, cfg = "exec"),
+        "konanc_libraries": attr.label_list(allow_files = True),
         "kotlin_target": attr.string(mandatory = True),
         "data_dir": attr.label(allow_single_file = True),
         "dependencies": attr.label_list(allow_files = True),
