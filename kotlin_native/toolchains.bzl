@@ -86,6 +86,7 @@ filegroup(
     srcs = glob([
         "konan/lib/*.jar",
     ]),
+    visibility = ["//visibility:public"],
 )
 
 filegroup(
