@@ -42,28 +42,6 @@ def _kt_native_toolchain_proxy_impl(repository_ctx):
                 stdlib_toolchain_type = _NATIVE_STDLIB_TOOLCHAIN_TYPE,
             )
 
-    select = ""
-    for toolchain_name in repository_ctx.attr.toolchain_names:
-        values = str(repository_ctx.attr.exec_compatible_with[toolchain_name])
-
-        content += """
-config_setting(
-    name = "{name}",
-    constraint_values = {values},
-)
-""".format(name = toolchain_name, values = values)
-        select += """
-    ":{name}": "@{compiler_repository}//:konanc_libraries",""".format(name = toolchain_name, compiler_repository = repository_ctx.attr.toolchain_repository_names[toolchain_name])
-
-    content += """
-alias(
-    name = "konanc_libraries",
-    actual = select({{{select}
-    }}),
-    visibility = ["//visibility:public"],
-)
-""".format(select = select)
-
     repository_ctx.file("BUILD.bazel", content, executable = False)
 
 _kt_native_toolchain_proxy = repository_rule(

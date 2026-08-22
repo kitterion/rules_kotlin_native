@@ -1,4 +1,6 @@
 load("//kotlin_native/internal:settings.bzl", "repeatable_string_flag")
+load("//tools:konanc_libraries.bzl", "konanc_libraries")
+load("@rules_java//java:java_import.bzl", "java_import")
 
 repeatable_string_flag(
     name = "kotlinc_opt",
@@ -22,8 +24,12 @@ toolchain_type(
     visibility = ["//visibility:public"],
 )
 
-alias(
+java_import(
     name = "konanc_libraries",
-    actual = "@kotlin_native_toolchains//:konanc_libraries",
+    jars = [":konanc_libraries_from_toolchain"],
     visibility = ["//visibility:public"],
+)
+
+konanc_libraries(
+    name = "konanc_libraries_from_toolchain",
 )
