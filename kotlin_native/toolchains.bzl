@@ -239,14 +239,21 @@ def _kt_native_repo_impl(repository_ctx):
             sha256 = dependency["sha256"],
         )
 
-    content = ""
+    extra_properties_content = ""
     for downloaded_dependency in repository_ctx.path("dependencies").readdir():
-        content += downloaded_dependency.basename
-        content += "\n"
+        dependency_name = downloaded_dependency.basename
+        extra_properties_content += "{0}.local = external/{1}/dependencies/{0}\n".format(dependency_name, repository_ctx.name)
+
+    properties = repository_ctx.read("konan/konan.properties")
+
+    properties += "\n\n"
+    properties += "airplaneMode = true\n"
+    properties += "dependencyProfiles = local\n"
+    properties += extra_properties_content
 
     repository_ctx.file(
-        "dependencies/.extracted",
-        content = content,
+        "konan/konan.properties",
+        content = properties,
         executable = False,
     )
 

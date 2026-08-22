@@ -9,7 +9,6 @@ def _kt_native_cinterop_impl(ctx):
     klib = ctx.actions.declare_file("{}.klib".format(ctx.label.name))
 
     args = ctx.actions.args()
-    args.add("cinterop")
     args.add("-output", klib)
     args.add("-target", ctx.toolchains["//kotlin_native:toolchain_type"].kotlin_target)
     args.add("-def", ctx.file.src)
@@ -55,7 +54,7 @@ def _kt_native_cinterop_impl(ctx):
             "KONAN_DATA_DIR": ctx.toolchains["//kotlin_native:toolchain_type"].data_dir.path,
         },
         arguments = [args],
-        executable = ctx.executable._konanc,
+        executable = ctx.executable._cinterop,
     )
 
     provider = KotlinNativeProvider(
@@ -79,8 +78,8 @@ kt_native_cinterop = rule(
         "module_name": attr.string(),
         "deps": attr.label_list(providers = [[CcInfo], [KotlinNativeProvider]]),
         "copts": attr.string_list(),
-        "_konanc": attr.label(
-            default = "//tools:konanc",
+        "_cinterop": attr.label(
+            default = "//tools:cinterop",
             executable = True,
             cfg = "exec",
         ),

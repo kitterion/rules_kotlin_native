@@ -1,14 +1,27 @@
 load(":konanc_libraries.bzl", "konanc_libraries")
 load("@rules_java//java:java_binary.bzl", "java_binary")
 load("@rules_java//java:java_import.bzl", "java_import")
+load("@rules_kotlin//kotlin/internal/jvm:jvm.bzl", "kt_jvm_binary")
 
-exports_files(["KonancWrapper.java"])
-
-java_binary(
+kt_jvm_binary(
     name = "konanc",
-    srcs = ["KonancWrapper.java"],
-    main_class = "rules_kotlin_native.KonancWrapper",
-    args = ["konanc"],
+    srcs = [
+        "Konanc.kt",
+    ],
+    main_class = "rules_kotlin_native.KonancKt",
+    deps = [
+        ":konanc_libraries",
+        "@bazel_worker_java//src/main/java/com/google/devtools/build/lib/worker:work_request_handlers"
+    ],
+    visibility = ["//visibility:public"],
+)
+
+kt_jvm_binary(
+    name = "cinterop",
+    srcs = [
+        "Cinterop.kt",
+    ],
+    main_class = "rules_kotlin_native.CinteropKt",
     deps = [
         ":konanc_libraries",
     ],

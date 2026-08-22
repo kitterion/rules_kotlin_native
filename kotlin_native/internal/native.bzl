@@ -41,7 +41,6 @@ def _common_args(ctx, output_type):
 
     args.add("-produce", output_type)
     args.add("-target", toolchain.kotlin_target)
-    args.add("-Xoverride-konan-properties=airplaneMode=true")
     args.add("-Xmulti-platform")
     args.add("-Xexpect-actual-classes")
     if toolchain.language_version:
@@ -236,7 +235,7 @@ def _compile(
 
     args.add_all(extra_compiler_flags)
 
-    args.use_param_file("@%s")
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
 
     compiler_plugins_classpath = []
@@ -261,8 +260,12 @@ def _compile(
         env = {
             "KONAN_DATA_DIR": ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].data_dir.path,
         },
-        arguments = ["konanc", args],
+        arguments = [args],
         executable = ctx.executable._konanc,
+        execution_requirements = {
+            "supports-workers" : "1",
+            "requires-worker-protocol" : "proto",
+        },
     )
 
     return module_name
@@ -383,7 +386,7 @@ def _kt_native_static_framework_impl(ctx):
 
     args.add_all(ctx.attr.kotlinc_opts)
 
-    args.use_param_file("@%s", use_always=True)
+    args.use_param_file("@%s", use_always = True)
     args.set_param_file_format("multiline")
 
     ctx.actions.run(
@@ -399,8 +402,12 @@ def _kt_native_static_framework_impl(ctx):
         env = {
             "KONAN_DATA_DIR": ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].data_dir.path,
         },
-        arguments = ["konanc", args],
+        arguments = [args],
         executable = ctx.executable._konanc,
+        execution_requirements = {
+            "supports-workers" : "1",
+            "requires-worker-protocol" : "proto",
+        },
     )
 
     args.add("-Xomit-framework-binary")
@@ -419,8 +426,12 @@ def _kt_native_static_framework_impl(ctx):
         env = {
             "KONAN_DATA_DIR": ctx.toolchains[NATIVE_TOOLCHAIN_TYPE].data_dir.path,
         },
-        arguments = ["konanc", args],
+        arguments = [args],
         executable = ctx.executable._konanc,
+        execution_requirements = {
+            "supports-workers" : "1",
+            "requires-worker-protocol" : "proto",
+        },
     )
 
     library_to_link = cc_common.create_library_to_link(

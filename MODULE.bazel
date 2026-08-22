@@ -10,6 +10,7 @@ bazel_dep(name = "rules_swift", version = "3.6.1", repo_name = "build_bazel_rule
 bazel_dep(name = "rules_kotlin", version = "2.4.0")
 bazel_dep(name = "rules_cc", version = "0.2.22")
 bazel_dep(name = "rules_java", version = "9.7.0")
+bazel_dep(name = "bazel_worker_java", version = "0.0.11")
 
 kotlin_native = use_extension("//kotlin_native:extensions.bzl", "kotlin_native")
 use_repo(kotlin_native, "kotlin_native_toolchains", "kotlin_native_ksp")
