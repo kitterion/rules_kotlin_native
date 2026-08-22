@@ -27,6 +27,17 @@ kt_jvm_binary(
     visibility = ["//visibility:public"],
 )
 
+kt_jvm_binary(
+    name = "klib",
+    srcs = [
+        "Klib.kt",
+    ],
+    main_class = "rules_kotlin_native.KlibKt",
+    deps = [
+        "//kotlin_native:konanc_libraries",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 java_binary(
     name = "ksp_compiler",
