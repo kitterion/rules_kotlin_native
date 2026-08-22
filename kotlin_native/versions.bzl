@@ -276,7 +276,7 @@ VERSIONS = {
                 "macos_x64",
                 "macos_arm64",
             ],
-            "sha256": "55ded039bb56a69aec9df354a92b42df9e916104e3c53d8d9852d9cc6617ed9d",
+            "sha256": "7bfda60c2a4ce859fc85011ea2c3229961b1eb40e9cc0b6b85fee885f23973cb",
             "dependencies": [{
                 "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.2.1-3-darwin-macos.tar.gz"],
                 "sha256": "b83357b2d4ad4be9d5466ac3cbf12570928d84109521ab687672ec8ef47d9edc",
@@ -296,7 +296,7 @@ VERSIONS = {
                 "macos_x64",
                 "macos_arm64",
             ],
-            "sha256": "7bfda60c2a4ce859fc85011ea2c3229961b1eb40e9cc0b6b85fee885f23973cb",
+            "sha256": "55ded039bb56a69aec9df354a92b42df9e916104e3c53d8d9852d9cc6617ed9d",
             "dependencies": [{
                 "urls": ["https://download.jetbrains.com/kotlin/native/libffi-3.3-1-macos-arm64.tar.gz"],
                 "sha256": "8ca0102ad5b626e8b1699f311ab098354a90154ea3e44951f28ebdd256862ba9",
