@@ -17,11 +17,11 @@ def _kotlin_native_impl(module_ctx):
                 api_version = toolchain.api_version,
             )
 
-    version = "2.1.21-2.0.1"
+    version = "2.3.11"
     http_archive(
         name = "kotlin_native_ksp",
         urls = ["https://github.com/google/ksp/releases/download/%s/artifacts.zip" % version],
-        integrity = "sha256-ROlluwZ7K7XNkYTassPepuPqt0fTQcB2RbtMiPCeScg=",
+        integrity = "sha256-sOdmbK96+2NDUMpkr5qIw70+BN85P9M9v0MNqvKFxrM=",
         build_file_content = """\
 load("@rules_java//java:java_import.bzl", "java_import")
 
@@ -29,7 +29,6 @@ FILES = [
     "symbol-processing-aa",
     "symbol-processing-aa-embeddable",
     "symbol-processing-api",
-    "symbol-processing-cmdline",
     "symbol-processing-common-deps",
     "symbol-processing-gradle-plugin",
 ]
