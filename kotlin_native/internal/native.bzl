@@ -152,6 +152,9 @@ def _generate_ksp_action(ctx, target, module_name, plugins, srcs, platform_srcs,
 
     args.add_joined(depset(transitive = classpath), join_with=":")
 
+    args.use_param_file("@%s", use_always = True)
+    args.set_param_file_format("multiline")
+
     ctx.actions.run(
         outputs = [output],
         inputs = depset(
@@ -162,6 +165,10 @@ def _generate_ksp_action(ctx, target, module_name, plugins, srcs, platform_srcs,
         progress_message = "Running ksp %{label}",
         arguments = [args],
         executable = ctx.executable._ksp_compiler,
+        execution_requirements = {
+            "supports-workers" : "1",
+            "requires-worker-protocol" : "proto",
+        },
     )
 
     return [output]
@@ -481,6 +488,11 @@ kt_native_static_framework = rule(
         "bundle_name": attr.string(),
         "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
         "kotlinc_opts": attr.string_list(),
+        "_ksp_compiler": attr.label(
+            default = "//tools:ksp_compiler",
+            executable = True,
+            cfg = "exec",
+        ),
         "_konanc": attr.label(
             default = "//tools:konanc",
             executable = True,
@@ -553,6 +565,11 @@ kt_native_test = rule(
         "deps": attr.label_list(providers = [KotlinNativeProvider]),
         "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
         "kotlinc_opts": attr.string_list(),
+        "_ksp_compiler": attr.label(
+            default = "//tools:ksp_compiler",
+            executable = True,
+            cfg = "exec",
+        ),
         "_konanc": attr.label(
             default = "//tools:konanc",
             executable = True,
@@ -583,6 +600,11 @@ kt_native_binary = rule(
         "deps": attr.label_list(providers = [KotlinNativeProvider]),
         "plugins": attr.label_list(providers = [[KtCompilerPluginInfo], [KspInfo]]),
         "kotlinc_opts": attr.string_list(),
+        "_ksp_compiler": attr.label(
+            default = "//tools:ksp_compiler",
+            executable = True,
+            cfg = "exec",
+        ),
         "_konanc": attr.label(
             default = "//tools:konanc",
             executable = True,
