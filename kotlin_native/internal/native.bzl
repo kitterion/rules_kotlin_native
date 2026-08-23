@@ -166,7 +166,8 @@ def _generate_ksp_action(ctx, target, module_name, plugins, srcs, platform_srcs,
         arguments = [args],
         executable = ctx.executable._ksp_compiler,
         execution_requirements = {
-            "supports-workers" : "1",
+            "supports-multiplex-workers" : "1",
+            "supports-multiplex-sandboxing": "1",
             "requires-worker-protocol" : "proto",
         },
     )

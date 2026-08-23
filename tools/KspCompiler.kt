@@ -83,10 +83,10 @@ class ClassLoaderCache {
         val fingerprint: String,
     )
 
-    fun get(classpath: List<String>): ClassLoader {
+    fun get(classpath: List<String>, sandboxDir: File?): ClassLoader {
         val sortedClasspath = classpath.sorted()
         val cacheKey = sortedClasspath.joinToString(File.pathSeparator)
-        val fingerprint = fingerprintOf(sortedClasspath)
+        val fingerprint = fingerprintOf(sortedClasspath, sandboxDir)
         return cache.compute(cacheKey) { _, existing ->
             if (existing != null && existing.fingerprint == fingerprint) {
                 return@compute existing
@@ -96,7 +96,7 @@ class ClassLoaderCache {
             }
             CacheEntry(
                 URLClassLoader(
-                    classpath.map { File(it).toURI().toURL() }.toTypedArray(),
+                    classpath.map { prependSandboxDir(sandboxDir, it).toURI().toURL() }.toTypedArray(),
                     ClassLoader.getSystemClassLoader(),
                 ),
                 fingerprint,
@@ -104,10 +104,10 @@ class ClassLoaderCache {
         }!!.classLoader
     }
 
-    fun fingerprintOf(classpath: List<String>): String {
+    fun fingerprintOf(classpath: List<String>, sandboxDir: File?): String {
         val digest = MessageDigest.getInstance("SHA-256")
         for (path in classpath) {
-            val file = File(path)
+            val file = prependSandboxDir(sandboxDir, path)
             digest.update(path.toByteArray(StandardCharsets.UTF_8))
             digest.update(file.length().toString().toByteArray(StandardCharsets.UTF_8))
             DigestInputStream(Files.newInputStream(file.toPath()), digest).use { it.readAllBytes() }
@@ -121,7 +121,35 @@ fun getCwd(): File {
     return File(cwd)
 }
 
-fun sanitizeKspConfig(config: KSPNativeConfig, tempDirectory: TempDirectory): KSPNativeConfig {
+fun prependSandboxDir(sandboxDir: File?, list: List<File>): List<File> {
+    if (sandboxDir == null) {
+        return list
+    }
+
+    return list.map { sandboxDir.resolve(it) }
+}
+
+fun prependSandboxDir(sandboxDir: File?, file: File): File {
+    if (sandboxDir == null) {
+        return file
+    }
+
+    return sandboxDir.resolve(file)
+}
+
+fun prependSandboxDir(sandboxDir: File?, string: String): File {
+    if (sandboxDir == null) {
+        return File(string)
+    }
+
+    return sandboxDir.resolve(string)
+}
+
+fun sanitizeKspConfig(
+    config: KSPNativeConfig,
+    tempDirectory: TempDirectory,
+    sandboxDir: File?,
+): KSPNativeConfig {
     fun create(name: String): File {
         val child = tempDirectory.dir.resolve(name)
         Files.createDirectory(child)
@@ -131,21 +159,21 @@ fun sanitizeKspConfig(config: KSPNativeConfig, tempDirectory: TempDirectory): KS
     return KSPNativeConfig(
         targetName = config.targetName,
         moduleName = config.moduleName,
-        sourceRoots = config.sourceRoots,
-        commonSourceRoots = config.commonSourceRoots,
-        libraries = config.libraries,
-        friends = config.friends,
+        sourceRoots = prependSandboxDir(sandboxDir, config.sourceRoots),
+        commonSourceRoots = prependSandboxDir(sandboxDir, config.commonSourceRoots),
+        libraries = prependSandboxDir(sandboxDir, config.libraries),
+        friends = prependSandboxDir(sandboxDir, config.friends),
         processorOptions = config.processorOptions,
-        projectBaseDir = config.projectBaseDir,
-        outputBaseDir = config.outputBaseDir,
+        projectBaseDir = prependSandboxDir(sandboxDir, config.projectBaseDir),
+        outputBaseDir = prependSandboxDir(sandboxDir, config.outputBaseDir),
         cachesDir = create("caches"),
         classOutputDir = create("classes"),
-        kotlinOutputDir = config.kotlinOutputDir,
+        kotlinOutputDir = prependSandboxDir(sandboxDir, config.kotlinOutputDir),
         resourceOutputDir = create("resources"),
         incremental = config.incremental,
         incrementalLog = config.incrementalLog,
-        modifiedSources = config.modifiedSources,
-        removedSources = config.removedSources,
+        modifiedSources = prependSandboxDir(sandboxDir, config.modifiedSources),
+        removedSources = prependSandboxDir(sandboxDir, config.removedSources),
         changedClasses = config.changedClasses,
         languageVersion = config.languageVersion,
         apiVersion = config.apiVersion,
@@ -155,9 +183,14 @@ fun sanitizeKspConfig(config: KSPNativeConfig, tempDirectory: TempDirectory): KS
     )
 }
 
-fun execute(args: Array<String>, logger: KspLogger, classLoaderCache: ClassLoaderCache): KotlinSymbolProcessing.ExitCode {
+fun execute(
+    args: Array<String>,
+    logger: KspLogger,
+    classLoaderCache: ClassLoaderCache,
+    sandboxDir: File?,
+): KotlinSymbolProcessing.ExitCode {
     val (config, classpath) = kspNativeArgParser(args)
-    val processorClassloader = classLoaderCache.get(classpath)
+    val processorClassloader = classLoaderCache.get(classpath, sandboxDir)
 
     @Suppress("UNCHECKED_CAST")
     val processorProviders = ServiceLoader
@@ -168,7 +201,7 @@ fun execute(args: Array<String>, logger: KspLogger, classLoaderCache: ClassLoade
         .toList() as List<SymbolProcessorProvider>
 
     val tempDir = TempDirectory()
-    val sanitizedConfig = sanitizeKspConfig(config, tempDir)
+    val sanitizedConfig = sanitizeKspConfig(config, tempDir, sandboxDir)
     return tempDir.use {
         KotlinSymbolProcessing(sanitizedConfig, processorProviders, logger).execute()
     }
@@ -188,9 +221,16 @@ fun processRequests() {
     val classLoaderCache = ClassLoaderCache()
     val callback = WorkRequestHandler.WorkRequestCallback { request, writer ->
         val args = request.argumentsList.toTypedArray()
+        val sandboxDir = request.sandboxDir?.let { File(it) }
 
-        val logger = KspLogger(writer, cwd)
-        val exitCode = execute(args, logger, classLoaderCache)
+        val sandboxRoot = if (sandboxDir != null) {
+            cwd.resolve(sandboxDir)
+        } else {
+            cwd
+        }
+
+        val logger = KspLogger(writer, sandboxRoot)
+        val exitCode = execute(args, logger, classLoaderCache, sandboxDir)
         exitCode.code
     }
     val requestHandler = WorkRequestHandler.WorkRequestHandlerBuilder(
@@ -215,6 +255,7 @@ fun main(args: Array<String>) {
             getCwd(),
         ),
         ClassLoaderCache(),
+        null,
     )
 
     exitProcess(exitCode.code)
